@@ -1,0 +1,163 @@
+from keys import C,b,AccessToken,AccessTokenSecret
+import re
+import tweepy
+from tweepy import OAuthHandler
+import time
+from time import sleep
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from credentials import *
+import collections
+from collections import Counter
+import textblob
+from textblob import TextBlob
+import tkinter
+import json
+import flag
+nltk.download('stopwords')
+import paralleldots
+from paralleldots import set_api_key , get_api_key
+
+
+
+oauth = tweepy.OAuthHandler(C,b)
+oauth.set_access_token(AccessToken,AccessTokenSecret)
+api = tweepy.API(oauth)
+
+paralleldots.set_api_key('ZvTOB4ABjE2xzek2sJQHhRZDcUUa2TyxBikYM048I2I')
+paralleldots.get_api_key()
+
+user=api.me()
+print(user.name)
+for follower in tweepy.Cursor(api.followers).items():
+    follower.follow()
+    print("followed everyone that is following:" + user.name)
+#stopwords
+a=[]
+example="Hi my name is Shivangi Chauhan"
+stop_words=stopwords.words("english")
+list1 = example.split()
+for word in list1:
+    if word not in stop_words:
+        a.append(word)
+        print(list1)
+        print(a)
+#retrieve
+def retrieve_tweets():
+    global tweets
+    tweet_input=input("enter")
+    tweets = api.search(v=tweet_input)
+    print(tweets)
+
+#count
+def f_count():
+    tweet_input=input("Enter")
+    tweets=api.search(v=tweet_input)
+    print("UserName    Followers Count")
+
+    for tweet in tweets:
+        print(tweet.user.name + "  "  +str(tweet.user.followers_count))
+
+#update
+def update_status():
+    update_status=api.update_status(status="what's going on!")
+    print(update_status)
+
+
+def tweet_location():
+    tweets=input("enter hashtags to search")
+    tweet1=api.search(tweets)
+    for search_result in tweet1:
+        print('location',search_result.user.location)
+        print('time_zone',search_result.user.time_zone)
+#
+def sentiments():
+    tweet_input=input("Enter the hashtag")
+    tweets = api.search(v=tweet_input)
+    print(tweets)
+
+    for tweet in tweets:
+        text=tweet.text
+
+    print("\nSentiments")
+    print(paralleldots.sentiment("you are wrong")["sentiment"])
+
+    def stopwords():
+        global count
+        stop_words = set(stopwords.words("ENGLISH"))
+        w = [w.upper() for w in stop_words]
+        tweets = api.user_timeline(screen_name="antman", count=20, tweet_mode="extended")
+        for tweet_compare in tweets:
+            test = tweet_compare.test
+            temp = []
+            temp.append(test)
+            t = temp
+            import re
+            cur_tweet = re.sub(r"http\s+ ", '', str(t))
+            cur_tweet1 = re.split(r"\s", cur_tweet)
+            cur_tweet = [w for w in cur_tweet1 if not w in stop_words]
+            cur_tweet = []
+        for w in cur_tweet1:
+            if w not in stop_words:
+                cur_tweet.append(w)
+                count = Counter(cur_tweet).most_common(5)
+        print(count)
+
+
+user_tweets = api.user_timeline()
+for tweet in user_tweets:
+    print(tweet.text)
+    print (user.followers_count)
+
+user1 = api.get_user('realDonaldTrump')
+print("Name:",user1.name)
+print("Location:",user1.location)
+print("Following:",user1.friends_count)
+print("Followers:",user1.followers_count)
+
+#json
+json_data = '{"name": "shivangi", "city": "Nahan"}'
+python_obj = json.loads(json_data)
+print(python_obj["name"])
+print(python_obj["city"])
+
+
+def display_menu():
+    print('''choose what you want:
+    1) Retrieve Tweets..
+    2)Count The Followers...
+    3)Update Status
+    4)Search Location ,Time Zone..
+    5)Find Sentiments..
+    6)Exit....''')
+
+    text=int(input("Enter what you want"))
+    if(text==1):
+        retrieve_tweets()
+        display_menu()
+
+    elif(text==2):
+        f_count()
+        display_menu()
+    elif(text==3):
+        update_status()
+        display_menu()
+    elif(text==4):
+        tweet_location()
+        display_menu()
+    elif(text==5):
+        sentiments()
+        display_menu()
+    elif(text==6):
+        print("THANK YOU")
+        flag=False
+    else:
+        print("enter valid input")
+display_menu()
+
+
+
+
+
+
